@@ -1,0 +1,127 @@
+﻿<UserControl x:Class="SharePointListComparer.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SharePointListComparer.Views"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+            mc:Ignorable="d"
+            xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+            TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+            Background="{DynamicResource MaterialDesignPaper}"
+            TextElement.FontWeight="Medium"
+            TextElement.FontSize="14"
+            FontFamily="{materialDesign:MaterialDesignFont}"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="5"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Background="{DynamicResource PrimaryHueDarkBrush}" Grid.ColumnSpan="4" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Name="spNavigationButtons" Orientation="Horizontal" Grid.Column="0" >
+                <Button ToolTip="Back" Name="btnBackNav" Click="btnBackNav_Click"  Margin="15,0,15,0" Width="25" Height="25" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" BorderBrush="{x:Null}" >
+                    <md:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="ArrowBack"></md:PackIcon>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0"  VerticalAlignment="Center"  Grid.Column="1">
+                <md:PackIcon Margin="0,0,5,1" Foreground="White" VerticalAlignment="Center" Kind="Settings"/>
+                <TextBlock Foreground="White" Text="Settings"></TextBlock>
+            </StackPanel>
+            <Button ToolTip="This will remove all SharePoint information." Name="btnReset" Click="btnReset_Click" Grid.Column="3" Margin="10,0,10,0" Content="Reset All and Save"></Button>
+            <Button Name="btnSave" Click="btnSave_Click" Grid.Column="4" Margin="10,0,10,0" Content="Save Settings"></Button>
+        </Grid>
+
+        <Grid Margin="15,15,15,15" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Margin="5,5,5,5" Grid.Row="0" FontWeight="Bold" VerticalAlignment="Center" Text="SharePoint Information"></TextBlock>
+
+            <Grid Margin="5,10,5,10" Grid.Row="1" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="35"/>
+                </Grid.ColumnDefinitions>
+                <md:PackIcon  Margin="0,0,10,0" VerticalAlignment="Center" Grid.Column="0" HorizontalAlignment="Center" Kind="User"></md:PackIcon>
+                <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="Username:" Margin="0,0,5,0"></TextBlock>
+                <TextBox VerticalContentAlignment="Center" Style="{Binding MaterialDesignFilledTextFieldTextBox}" Grid.Column="2" Name="tbSPUsername"></TextBox>
+                <md:PackIcon  Visibility="Hidden" Name="userWarning" Margin="0,0,10,0" Foreground="DarkRed" VerticalAlignment="Center" Grid.Column="3" HorizontalAlignment="Center" Kind="Warning"></md:PackIcon>
+            </Grid>
+            <Grid Grid.Row="2" Margin="5,10,5,10" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="35"/>
+                </Grid.ColumnDefinitions>
+                <md:PackIcon Margin="0,0,10,0" VerticalAlignment="Center" Grid.Column="0" HorizontalAlignment="Center" Kind="TextboxPassword"></md:PackIcon>
+                <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="Password:" Margin="0,0,5,0"></TextBlock>
+                <PasswordBox PasswordChanged="tbSPPasssword_PasswordChanged" VerticalContentAlignment="Center" md:HintAssist.Hint="Password" Style="{Binding MaterialDesignFloatingHintPasswordBox}" Grid.Column="2"  Name="tbSPPasssword"></PasswordBox>
+                <md:PackIcon  Visibility="Hidden" Name="passWarning"  Margin="0,0,10,0" Foreground="DarkRed" VerticalAlignment="Center" Grid.Column="3" HorizontalAlignment="Center" Kind="Warning"></md:PackIcon>
+            </Grid>
+
+            <Grid Grid.Row="3" Margin="5,10,5,10" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="35"/>
+                </Grid.ColumnDefinitions>
+                <md:PackIcon Margin="0,0,10,0" VerticalAlignment="Center" Grid.Column="0" HorizontalAlignment="Center" Kind="Web"></md:PackIcon>
+                <TextBlock VerticalAlignment="Center" Grid.Column="1" Text="Site Url:" Margin="0,0,5,0"></TextBlock>
+                <TextBox VerticalContentAlignment="Center" Name="tbSiteURL" Style="{Binding MaterialDesignFilledTextFieldTextBox}" Grid.Column="2"  ></TextBox>
+                <md:PackIcon Visibility="Hidden" Name="siteWarning"  Margin="0,0,10,0" Foreground="DarkRed" VerticalAlignment="Center" Grid.Column="3" HorizontalAlignment="Center" Kind="Warning"></md:PackIcon>
+            </Grid>
+
+            <StackPanel Grid.Row="4" Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox Name="chkOnline" Style="{Binding MaterialDesignDarkCheckBox}" VerticalContentAlignment="Center" Margin="5,5,5,5" Content="SharePoint Online"></CheckBox>
+                    <md:PackIcon  Visibility="Hidden" Name="isOnlineWarning"  Margin="5,0,0,0" Foreground="DarkRed" VerticalAlignment="Center" Grid.Column="3" HorizontalAlignment="Center" Kind="Warning"></md:PackIcon>
+                </StackPanel>
+                <CheckBox Name="chkRemember" Style="{Binding MaterialDesignDarkCheckBox}" VerticalContentAlignment="Center" Margin="5,5,5,5" Content="Remember Me"></CheckBox>
+            </StackPanel>
+
+            <StackPanel Visibility="Hidden" Name="passSpaceWarning" Grid.Row="5" Orientation="Horizontal">
+                <md:PackIcon Foreground="DarkRed" Margin="0,0,5,0" VerticalAlignment="Center" Kind="warning"></md:PackIcon>
+                <TextBlock VerticalAlignment="Center" Foreground="DarkRed" FontWeight="Bold" Text="You're password contains spaces, ignore this if that's correct."></TextBlock>
+            </StackPanel>
+        </Grid>
+
+        <Rectangle Height="auto" Margin="0,25,0,25" Grid.Row="1" Width="2" Grid.Column="2" Fill="DarkGray" />
+
+        <Grid Margin="10,25,10,5" Grid.Column="3" Grid.Row="1" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="35"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <md:PackIcon Width="30" Height="30" Margin="0,0,5,0" VerticalAlignment="Center" Kind="InfoOutline"></md:PackIcon>
+                <TextBlock VerticalAlignment="Center" FontWeight="Bold"  Text="Information"></TextBlock>
+            </StackPanel>
+            <TextBlock Margin="0,10,0,0"  Grid.Row="1" TextWrapping="Wrap" TextAlignment="Left" Text="In order to add and access Lists from a SharePoint Environment for comparison analysis you need to ensure these details are set correctly."></TextBlock>
+        </Grid>
+    </Grid>
+</UserControl>

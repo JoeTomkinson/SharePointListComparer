@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="SharePointListComparer.Views.ComparisonResultsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SharePointListComparer.Views"
+       xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        MinWidth="700" MinHeight="350" d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Grid Background="{DynamicResource PrimaryHueDarkBrush}" Grid.ColumnSpan="3" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Name="spNavigationButtons" Orientation="Horizontal" Grid.Column="0"  Grid.ColumnSpan="2">
+                <Button ToolTip="Back" Name="btnBackNav" Click="btnBackNav_Click"  Margin="15,0,15,0" Width="25" Height="25" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" BorderBrush="{x:Null}" >
+                    <md:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="ArrowBack"></md:PackIcon>
+                </Button>
+                <Button ToolTip="Open In New Window" Name="btnOpenInNew" Click="btnOpenInNew_Click"  Margin="5,0,15,0" Width="25" Height="25" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" BorderBrush="{x:Null}" >
+                    <md:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="OpenInNew"></md:PackIcon>
+                </Button>
+            </StackPanel>
+            <Button Name="btnSave" Click="btnSave_Click" Grid.Column="3" Margin="10,0,10,0" Content="Save Results"></Button>
+        </Grid>
+
+        <DataGrid MouseDoubleClick="dgComparisonResults_MouseDoubleClick" Name="dgComparisonResults" BorderThickness="1" BorderBrush="DarkGray" Background="{DynamicResource SecondaryAccentForegroundBrush}" IsReadOnly="true" AutoGenerateColumns="False" Grid.ColumnSpan="3" Margin="10" Grid.Row="1">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Comparison Index" Binding="{Binding ComparisonIndex}" />
+                <DataGridTextColumn Header="List Name" Binding="{Binding ListName}" />
+                <DataGridTextColumn Header="Compared List Name" Binding="{Binding ComparisonListName}" />
+                <DataGridCheckBoxColumn ElementStyle="{Binding MaterialDesignDataGridComboBox}" Header="Identical" Binding="{Binding Identical}" />
+                <DataGridCheckBoxColumn ElementStyle="{Binding MaterialDesignDataGridComboBox}" Header="Are Views Identical" Binding="{Binding AreViewsIdentical}" />
+            </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="{x:Type DataGridRow}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Identical}" Value="True">
+                            <Setter Property="Background" Value="LightGreen" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Identical}" Value="False">
+                            <Setter Property="Background" Value="DarkRed" />
+                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+    </Grid>
+</UserControl>

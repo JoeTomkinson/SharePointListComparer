@@ -1,0 +1,59 @@
+﻿<UserControl x:Class="SharePointListComparer.Views.ViewFieldsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SharePointListComparer.Views"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="{materialDesign:MaterialDesignFont}"
+        BorderBrush="Black"
+        BorderThickness="2"
+        MinWidth="700" MinHeight="350"
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"></RowDefinition>
+            <RowDefinition Height="25"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid Background="{DynamicResource PrimaryHueDarkBrush}" Grid.ColumnSpan="3" Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Name="col1" Width="auto"></ColumnDefinition>
+                <ColumnDefinition Name="col2" Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="auto"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <StackPanel Name="spNavigationButtons" Orientation="Horizontal" Grid.Column="0"  Grid.ColumnSpan="2">
+                <Button ToolTip="Back" Name="btnBackNav" Click="btnBackNav_Click"  Margin="15,0,15,0" Width="25" Height="25" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" BorderBrush="{x:Null}" >
+                    <md:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="ArrowBack"></md:PackIcon>
+                </Button>
+                <Button ToolTip="Open In New Window" Name="btnOpenInNew" Click="btnOpenInNew_Click"  Margin="5,0,15,0" Width="25" Height="25" Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}" BorderBrush="{x:Null}" >
+                    <md:PackIcon VerticalAlignment="Center" HorizontalAlignment="Center" Kind="OpenInNew"></md:PackIcon>
+                </Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="10,0,0,0"  VerticalAlignment="Center"  Grid.Column="2">
+                <md:PackIcon Margin="0,0,5,1" Foreground="White" VerticalAlignment="Center" Kind="InformationCircle"/>
+                <TextBlock Foreground="White" Text="Click a view to see it's columns"></TextBlock>
+            </StackPanel>
+            <TextBlock Name="tbListName" VerticalAlignment="Center" Foreground="White" Grid.Column="4" Margin="10,0,15,0" Text="VIEWING LISTNAME"></TextBlock>
+        </Grid>
+
+        <DataGrid BorderBrush="CadetBlue" BorderThickness="2" Name="dgViews" AutoGenerateColumns="True" IsReadOnly="True" SelectionChanged="dgViews_SelectionChanged" Grid.Row="1" Grid.RowSpan="2" Grid.Column="0" Margin="5,5,5,5" ></DataGrid>
+        <TextBlock Name="tbViewColumnCount" Grid.Row="1" VerticalAlignment="Center" FontWeight="Bold" Margin="5,0,5,0" Text="Column Count: " Grid.Column="1" Grid.ColumnSpan="2"></TextBlock>
+
+        <ListView MouseDoubleClick="lvViewColumns_MouseDoubleClick" Background="Gray" BorderBrush="CadetBlue" BorderThickness="2" Name="lvViewColumns" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Margin="5,5,5,5" SelectionMode="Single" ></ListView>
+    </Grid>
+</UserControl>
