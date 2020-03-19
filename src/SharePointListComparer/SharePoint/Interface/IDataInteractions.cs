@@ -8,5 +8,7 @@
         object GetAllLists();
 
         object LoadListItems(object list);
+
+        object CreateLists(object lists);
     }
 }

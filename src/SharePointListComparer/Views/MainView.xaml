@@ -7,6 +7,7 @@
              xmlns:gif="http://wpfanimatedgif.codeplex.com"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         mc:Ignorable="d"
+        xmlns:valueconverters="clr-namespace:SharePointListComparer.ValueConverters"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         Background="{DynamicResource MaterialDesignPaper}"
@@ -14,6 +15,9 @@
         TextElement.FontSize="14"
         FontFamily="{materialDesign:MaterialDesignFont}"
         MinWidth="700" MinHeight="350" d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <valueconverters:BoolToImageSharePointLocal x:Key="LocalIfTrueImageConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid Name="grdContent" >
             <Grid.ColumnDefinitions>
@@ -34,6 +38,7 @@
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
                     <ColumnDefinition Width="auto"></ColumnDefinition>
+                    <ColumnDefinition Width="auto"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal" Margin="10,0,0,0"  VerticalAlignment="Center"  Grid.Column="0">
                     <md:PackIcon Margin="0,0,5,1" Foreground="White" VerticalAlignment="Center" Kind="InformationCircle"/>
@@ -44,14 +49,29 @@
                 <Button Name="btnSettings" Click="btnSettings_Click" Grid.Column="4" Margin="0,0,10,0" Style="{StaticResource MaterialDesignIconButton}" Width="35" Height="35" Background="{x:Null}" BorderBrush="{x:Null}">
                     <md:PackIcon Width="25" Height="25" Foreground="White" Kind="Settings"/>
                 </Button>
+                <Button Name="btnAttributions" Click="btnAttributions_Click" Grid.Column="5" Margin="0,0,10,0" Style="{StaticResource MaterialDesignIconButton}" Width="35" Height="35" Background="{x:Null}" BorderBrush="{x:Null}">
+                    <md:PackIcon Width="25" Height="25" Foreground="White" Kind="Cc"/>
+                </Button>
             </Grid>
 
             <DataGrid Name="dgLeftList" IsReadOnly="true" AutoGenerateColumns="false" MouseDoubleClick="list_MouseDoubleClick" Grid.Row="1" Grid.Column="0" BorderThickness="1" BorderBrush="DarkGray" Background="{DynamicResource SecondaryAccentForegroundBrush}" Margin="15,10,5,10">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Comparison Index" DisplayIndex="0"></DataGridTextColumn>
-                    <DataGridTextColumn DisplayIndex="1" Header="List Name" Binding="{Binding ListName}" />
-                    <DataGridTextColumn DisplayIndex="2" Header="Column Count" Binding="{Binding ColumnCount}" />
+                    <DataGridTemplateColumn DisplayIndex="0"  Header="" Width="40" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center" Source="{Binding Path=LocalList, Converter={StaticResource LocalIfTrueImageConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Comparison Index" DisplayIndex="1"></DataGridTextColumn>
+                    <DataGridTextColumn DisplayIndex="2" Header="List Name" Binding="{Binding ListName}" />
+                    <DataGridTextColumn DisplayIndex="3" Header="Column Count" Binding="{Binding ColumnCount}" />
                 </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="miLeftSubmitToSharePoint" Header="Upload to SharePoint Site" Click="miLeftSubmitToSharePoint_Click" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
             </DataGrid>
 
             <GridSplitter Grid.Column="1"
@@ -64,10 +84,22 @@
 
             <DataGrid Name="dgRightList" IsReadOnly="true" MouseDoubleClick="list_MouseDoubleClick" AutoGenerateColumns="false" Grid.Row="1" Grid.Column="2" BorderThickness="1" BorderBrush="DarkGray" Background="{DynamicResource SecondaryAccentForegroundBrush}" Margin="5,10,15,10">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Comparison Index" DisplayIndex="0"></DataGridTextColumn>
-                    <DataGridTextColumn DisplayIndex="1" Header="List Name" Binding="{Binding ListName}" />
-                    <DataGridTextColumn DisplayIndex="2" Header="Column Count" Binding="{Binding ColumnCount}" />
+                    <DataGridTemplateColumn DisplayIndex="0"  Header="" Width="40" IsReadOnly="True">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center" Source="{Binding Path=LocalList, Converter={StaticResource LocalIfTrueImageConverter}}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Comparison Index" DisplayIndex="1"></DataGridTextColumn>
+                    <DataGridTextColumn DisplayIndex="2" Header="List Name" Binding="{Binding ListName}" />
+                    <DataGridTextColumn DisplayIndex="3" Header="Column Count" Binding="{Binding ColumnCount}" />
                 </DataGrid.Columns>
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Name="miRightSubmitToSharePoint" Header="Upload to SharePoint Site" Click="miRightSubmitToSharePoint_Click" />
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
             </DataGrid>
 
             <md:Card Name="leftCardOptions" HorizontalAlignment="Left" Width="250" UniformCornerRadius="5" Margin="10,5,5,5" Height="50" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="0">
@@ -104,7 +136,7 @@
                     <Button Name="btnRemoveRight" Click="btnRemoveRight_Click" Margin="5,0,0,0" Grid.Column="1" Content="Remove" ></Button>
                 </Grid>
             </Grid>
-            
+
             <md:Card Name="rightCardOptions" Width="250" HorizontalAlignment="Right" UniformCornerRadius="5" Margin="10,5,5,5" Height="50" VerticalAlignment="Bottom" Grid.Row="1" Grid.Column="2">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -115,11 +147,10 @@
                     <Button Name="btnRightServer" Click="btnRightServer_Click" Grid.Column="1" Content="Online" Margin="5,5,5,5"></Button>
                 </Grid>
             </md:Card>
+        </Grid>
 
-            <Grid Visibility="Collapsed" Name="grdLoadingOverlay" Background="White" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="2" >
-                <Image gif:ImageBehavior.AnimatedSource="/SharePointListComparer;component/Assets/spLoading.gif" ></Image>
-            </Grid>
-
+        <Grid Visibility="Collapsed" Name="grdLoadingOverlay" Background="White" Grid.Row="1" Grid.ColumnSpan="3" Grid.RowSpan="2" >
+            <Image gif:ImageBehavior.AnimatedSource="/SharePointListComparer;component/Assets/spLoading.gif" ></Image>
         </Grid>
     </Grid>
 </UserControl>

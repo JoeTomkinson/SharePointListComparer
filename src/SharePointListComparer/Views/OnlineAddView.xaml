@@ -54,7 +54,7 @@
         </DataGrid>
 
         <Grid Name="grdLoadingOverlay" Background="White" Grid.Row="1" Grid.ColumnSpan="3" >
-            <Image gif:ImageBehavior.AnimatedSource="/SharePointListComparer;component/Assets/spLoading.gif" ></Image>
+            <Image MaxHeight="325" MaxWidth="325" gif:ImageBehavior.AnimatedSource="/SharePointListComparer;component/Assets/spLoading.gif" ></Image>
         </Grid>
 
         <Grid Background="{DynamicResource PrimaryHueDarkBrush}" Grid.ColumnSpan="3" Grid.Row="2">

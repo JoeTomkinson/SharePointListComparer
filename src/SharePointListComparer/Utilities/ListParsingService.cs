@@ -9,24 +9,24 @@ using SharePointListComparer.Models;
 
 namespace SharePointListComparer.Utilities
 {
-    public class ListParsingService
+    public class LocalListParsingService
     {
         /// <summary>
         /// Default constructor
         /// </summary>
-        public ListParsingService()
+        public LocalListParsingService()
         {
             //
         }
 
         public SharePointListStructure ParseSPTFile(string filepath)
         {
-            var cachedString = File.ReadAllText(filepath);
+            var fullXMLString = File.ReadAllText(filepath);
 
             string xmlString = string.Empty;
 
             // remove <Data></Data> node
-            var readString = cachedString;
+            var readString = fullXMLString;
             string dataPattern = "<Data>[\\s\\S]*?<\\/Data>";
             Regex dataRegex = new Regex(
                 dataPattern,
@@ -64,14 +64,14 @@ namespace SharePointListComparer.Utilities
             // we failed to parse the XML into an object, so let's try to manually extract the data we need
             if (attemptManual)
             {
-                template = ManualXMLParse(cachedString, doc, template);
+                template = ManualXMLParse(fullXMLString, doc, template);
             }
 
             if (template == null)
             {
                 // if we are null here we need to abort this parsing.
                 string value = null;
-                var groups = Regex.Match(cachedString, "(?<=TemplateTitle>).*(?=</TemplateTitle>)").Groups;
+                var groups = Regex.Match(fullXMLString, "(?<=TemplateTitle>).*(?=</TemplateTitle>)").Groups;
                 if (groups != null && groups?.Count > 0)
                 {
                     value = groups[0].Value;
@@ -81,6 +81,9 @@ namespace SharePointListComparer.Utilities
                 {
                     ListName = value ?? "No List Name could be retrieved from XML",
                     ColumnDefinitions = null,
+                    ListPhysicalPath = filepath,
+                    LocalList = true,
+                    FullXMLSchema = fullXMLString,
                 };
             }
 
@@ -90,7 +93,10 @@ namespace SharePointListComparer.Utilities
                 {
                     ListName = template.Details.TemplateTitle,
                     ColumnDefinitions = new List<ColumnDefinition>(),
-                    ViewDefinitions = new List<SharePointListView>()
+                    ViewDefinitions = new List<SharePointListView>(),
+                    LocalList = true,
+                    ListPhysicalPath = filepath,
+                    FullXMLSchema = fullXMLString,
                 };
 
                 foreach (var field in template.UserLists.List.MetaData.Fields)
@@ -130,10 +136,10 @@ namespace SharePointListComparer.Utilities
 
                 return sharePointListStructure;
             }
-            catch (Exception genEx)
+            catch (Exception)
             {
                 string value = null;
-                var groups = Regex.Match(cachedString, "(?<=TemplateTitle>).*(?=</TemplateTitle>)").Groups;
+                var groups = Regex.Match(fullXMLString, "(?<=TemplateTitle>).*(?=</TemplateTitle>)").Groups;
                 if (groups != null && groups?.Count > 0)
                 {
                     value = groups[0].Value;
@@ -143,13 +149,9 @@ namespace SharePointListComparer.Utilities
                 {
                     ListName = value ?? "No List Name could be retrieved from XML",
                     ColumnDefinitions = null,
+                    FullXMLSchema = fullXMLString,
                 };
             }
-        }
-
-        public SharePointListStructure ParseOnlineList(string listname)
-        {
-            return null;
         }
 
         private ListTemplate ManualXMLParse(string rawXMLString, XmlDocument doc, ListTemplate template)

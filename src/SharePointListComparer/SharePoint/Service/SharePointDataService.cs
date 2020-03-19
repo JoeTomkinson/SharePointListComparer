@@ -6,6 +6,7 @@ using System.Net;
 using System.Security;
 using System.Threading.Tasks;
 using SharePointListComparer.SharePoint.Abstract;
+using SharePointListComparer.Models;
 
 namespace SharePointListComparer.SharePoint.Service
 {
@@ -72,6 +73,28 @@ namespace SharePointListComparer.SharePoint.Service
             lists = web?.Lists;
         }
 
+        public override object CreateLists(object lists)
+        {
+            if (lists is List<SharePointListStructure> spLists)
+            {
+                foreach (var list in spLists)
+                {
+                    bool templateUploaded = UploadTemplateToSharePoint(list);
+                    bool listCreated = false;
+                    if (templateUploaded)
+                    {
+                        listCreated = CreateListFromTemplate(list);
+                    }
+                }
+
+                return null;
+            }
+            else
+            {
+                return new ArgumentException($"Did not receive expected class type of {nameof(List<SharePointListStructure>)}");
+            }
+        }
+
         public override object GetAllLists()
         {
             clientContext.Load(web.Lists, lists => lists.Include(list => list.Title, list => list.Id));
@@ -103,6 +126,68 @@ namespace SharePointListComparer.SharePoint.Service
                 return spList;
             }
             return list;
+        }
+
+        private bool UploadTemplateToSharePoint(SharePointListStructure list)
+        {
+            var featureID = Guid.NewGuid();
+
+            // Get the List template Gallery Folder
+            var listTemplateGallery = web.Lists.GetByTitle("List Template Gallery");
+            var listFolder = listTemplateGallery.RootFolder;
+            FileCreationInformation fileCreationInformation = new FileCreationInformation
+            {
+                Content = System.IO.File.ReadAllBytes(list.ListPhysicalPath),
+                Overwrite = true,
+                Url = "_catalogs/lt/" + list.ListName + ".stp",
+            };
+
+            var file = listFolder.Files.Add(fileCreationInformation);
+            file.Update();
+            clientContext.Load(file);
+
+            try
+            {
+                clientContext.ExecuteQuery();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool CreateListFromTemplate(SharePointListStructure list)
+        {
+            // Create list
+            //ListCreationInformation listCreationInfo = new ListCreationInformation
+            //{
+            //    Title = list.ListName,
+            //    TemplateType = (int)ListTemplateType.GenericList
+            //};
+            //List oList = web.Lists.Add(listCreationInfo);
+            //clientContext.ExecuteQuery();
+
+            //// add fields to list
+
+            //var pList = clientContext.Web.Lists.GetByTitle(list.ListName);
+
+            //pList
+
+            //var pField = oList.Fields.AddFieldAsXml("<Field DisplayName='MyField' Type='Number' />",
+
+            //    true, AddFieldOptions.DefaultValue);
+
+            //var fieldNumber = clientContext.CastTo<FieldNumber>(pField);
+            //fieldNumber.MaximumValue = 100;
+            //fieldNumber.MinimumValue = 35;
+
+            //fieldNumber.Update();
+
+            //clientContext.ExecuteQuery();
+
+            return true;
         }
     }
 }

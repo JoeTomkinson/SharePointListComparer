@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using SharePointListComparer.Models;
+using SharePointListComparer.SharePoint.Service;
 using SharePointListComparer.Storage;
 using SharePointListComparer.Utilities;
 using SharePointListComparer.ValueConverters;
@@ -15,6 +16,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Tooling.SharePointListComparer.Views;
 
 namespace SharePointListComparer.Views
 {
@@ -23,7 +25,9 @@ namespace SharePointListComparer.Views
     /// </summary>
     public partial class MainView : UserControl
     {
-        public ListParsingService ListParsingService { get; set; }
+        public LocalListParsingService ListParsingService { get; set; }
+
+        public SharePointDataService SharePointDataService { get; set; } = null;
 
         public CabService CabService { get; set; }
 
@@ -37,10 +41,73 @@ namespace SharePointListComparer.Views
             // initialise rest of control
             leftCardOptions.Visibility = Visibility.Hidden;
             rightCardOptions.Visibility = Visibility.Hidden;
-            ListParsingService = new ListParsingService();
+            ListParsingService = new LocalListParsingService();
             CabService = new CabService();
             SetUpDataGrids();
             this.LayoutUpdated += MainView_LayoutUpdated;
+
+            SetUpSharePointDataService(false);
+        }
+
+        private void SetUpSharePointDataService(bool synchronous)
+        {
+            if (!synchronous)
+            {
+                Task.Run(() =>
+                {
+                    var sharePointInformation = ApplicationState.GetValue<SharePointInformation>("SharePointInformation");
+                    if (sharePointInformation != null && !string.IsNullOrEmpty(sharePointInformation?.Username))
+                    {
+                        var password = PortableCryptography.Decrypt(sharePointInformation.EncryptedPassword, sharePointInformation.Username);
+                        var username = sharePointInformation.Username;
+                        var siteUrl = sharePointInformation.SiteUrl;
+                        var isOnlineSite = sharePointInformation.IsSharePointOnline;
+
+                        // create SharePoint Client
+                        SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+
+                        Dispatcher.Invoke(() =>
+                        {
+                            // make a note of our failed lists.
+                            miLeftSubmitToSharePoint.IsEnabled = true;
+                            miRightSubmitToSharePoint.IsEnabled = true;
+                        });
+                    }
+                    else
+                    {
+                        Dispatcher.Invoke(() =>
+                        {
+                            // make a note of our failed lists.
+                            miLeftSubmitToSharePoint.IsEnabled = false;
+                            miRightSubmitToSharePoint.IsEnabled = false;
+                        });
+                    }
+                });
+            }
+            else
+            {
+                var sharePointInformation = ApplicationState.GetValue<SharePointInformation>("SharePointInformation");
+                if (sharePointInformation != null && !string.IsNullOrEmpty(sharePointInformation?.Username))
+                {
+                    var password = PortableCryptography.Decrypt(sharePointInformation.EncryptedPassword, sharePointInformation.Username);
+                    var username = sharePointInformation.Username;
+                    var siteUrl = sharePointInformation.SiteUrl;
+                    var isOnlineSite = sharePointInformation.IsSharePointOnline;
+
+                    // create SharePoint Client
+                    SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+
+                    // make a note of our failed lists.
+                    miLeftSubmitToSharePoint.IsEnabled = true;
+                    miRightSubmitToSharePoint.IsEnabled = true;
+                }
+                else
+                {
+                    // make a note of our failed lists.
+                    miLeftSubmitToSharePoint.IsEnabled = false;
+                    miRightSubmitToSharePoint.IsEnabled = false;
+                }
+            }
         }
 
         private void MainView_LayoutUpdated(object sender, EventArgs e)
@@ -59,7 +126,7 @@ namespace SharePointListComparer.Views
             RightSharePointLists = new ObservableCollection<SharePointListStructure>();
 
             // set up left datagrind
-            DataGridTextColumn col = dgLeftList.Columns[0] as DataGridTextColumn;
+            DataGridTextColumn col = dgLeftList.Columns[1] as DataGridTextColumn;
             Binding binding = new Binding
             {
                 RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridRow), 1),
@@ -73,7 +140,7 @@ namespace SharePointListComparer.Views
             dgLeftList.EnableRowVirtualization = false;
 
             // Set up right datagrid
-            DataGridTextColumn colRight = dgRightList.Columns[0] as DataGridTextColumn;
+            DataGridTextColumn colRight = dgRightList.Columns[1] as DataGridTextColumn;
             Binding bindingRight = new Binding
             {
                 RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(DataGridRow), 1),
@@ -430,6 +497,48 @@ namespace SharePointListComparer.Views
             rightCardOptions.Visibility = Visibility.Hidden;
         }
 
+        private void miLeftSubmitToSharePoint_Click(object sender, RoutedEventArgs e)
+        {
+            SubmitToSharePoint(dgLeftList);
+        }
+
+        private void miRightSubmitToSharePoint_Click(object sender, RoutedEventArgs e)
+        {
+            SubmitToSharePoint(dgRightList);
+        }
+
+        private void btnAttributions_Click(object sender, RoutedEventArgs e)
+        {
+            RootWindow.AddToMainContentView(new AttributionView());
+        }
+
         #endregion
+
+        private void SubmitToSharePoint(DataGrid dataGrid)
+        {
+            if (SharePointDataService != null)
+            {
+                var selectedLists = new List<SharePointListStructure>();
+                for (int i = 0; i < dataGrid.SelectedItems.Count; i++)
+                {
+                    selectedLists.Add((SharePointListStructure)dataGrid.SelectedItems[i]);
+                }
+
+                var includesOnlineLists = selectedLists.Any(x => !x.LocalList);
+                var localLists = selectedLists.FindAll(x => x.LocalList);
+
+                if (includesOnlineLists)
+                {
+                    RootWindow.MessageQueue.Enqueue("Ignoring Online Lists.");
+                }
+
+                // pass through our lists to create in SharePoint.
+                SharePointDataService.CreateLists(localLists);
+            }
+            else
+            {
+                RootWindow.MessageQueue.Enqueue("No SharePoint Site Set.");
+            }
+        }
     }
 }

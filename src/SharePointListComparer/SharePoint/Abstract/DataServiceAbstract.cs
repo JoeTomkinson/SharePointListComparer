@@ -9,6 +9,8 @@ namespace SharePointListComparer.SharePoint.Abstract
         {
         }
 
+        public abstract object CreateLists(object lists);
+
         public abstract object GetAllLists();
 
         public abstract object LoadListItems(object list);
