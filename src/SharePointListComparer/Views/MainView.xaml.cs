@@ -64,7 +64,19 @@ namespace SharePointListComparer.Views
                         var isOnlineSite = sharePointInformation.IsSharePointOnline;
 
                         // create SharePoint Client
-                        SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+                        try
+                        {
+                            SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+                        }
+                        catch (Exception ex)
+                        {
+                            //IdcrlException: The sign-in name or password does not match one in the Microsoft account system.
+                            var innerEx = ex.InnerException?.Message;
+                            if (!string.IsNullOrEmpty(innerEx))
+                            {
+                                RootWindow.MessageQueue.Enqueue("Failed attempting to connect to SharePoint isntance: " + innerEx);
+                            }
+                        }
 
                         Dispatcher.Invoke(() =>
                         {
@@ -95,7 +107,19 @@ namespace SharePointListComparer.Views
                     var isOnlineSite = sharePointInformation.IsSharePointOnline;
 
                     // create SharePoint Client
-                    SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+                    try
+                    {
+                        SharePointDataService = new SharePointDataService(username, password, siteUrl, isOnlineSite);
+                    }
+                    catch (Exception ex)
+                    {
+                        //IdcrlException: The sign-in name or password does not match one in the Microsoft account system.
+                        var innerEx = ex.InnerException?.Message;
+                        if (!string.IsNullOrEmpty(innerEx))
+                        {
+                            RootWindow.MessageQueue.Enqueue("Failed attempting to connect to SharePoint isntance: " + innerEx);
+                        }
+                    }
 
                     // make a note of our failed lists.
                     miLeftSubmitToSharePoint.IsEnabled = true;
